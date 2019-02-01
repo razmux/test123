@@ -612,7 +612,8 @@ int party_member_withdraw(int party_id, uint32 account_id, uint32 char_id)
 	struct map_session_data* sd = map_id2sd(account_id);
 	struct party_data* p = party_search(party_id);
 
-	if( p ) {
+	if( p ) 
+	{
 		int i;
 		ARR_FIND( 0, MAX_PARTY, i, p->party.member[i].account_id == account_id && p->party.member[i].char_id == char_id );
 		if( i < MAX_PARTY ) {
@@ -621,10 +622,12 @@ int party_member_withdraw(int party_id, uint32 account_id, uint32 char_id)
 			memset(&p->data[i], 0, sizeof(p->data[0]));
 			p->party.count--;
 			party_check_state(p);
+			clif_party_info(p, NULL);
 		}
 	}
 
-	if( sd && sd->status.party_id == party_id && sd->status.char_id == char_id ) {
+	if( sd && sd->status.party_id == party_id && sd->status.char_id == char_id ) 
+	{
 #ifdef BOUND_ITEMS
 		int idxlist[MAX_INVENTORY]; //or malloc to reduce consumtion
 		int j,i;
@@ -637,6 +640,11 @@ int party_member_withdraw(int party_id, uint32 account_id, uint32 char_id)
 #endif
 
 		sd->status.party_id = 0;
+		if( sd->state.spb ) 
+		{
+			sd->state.spb = 0;
+			clif_displaymessage(sd->fd, "Displaying party member's buffs disabled.");
+		}
 		clif_charnameupdate(sd); //Update name display [Skotlex]
 		//TODO: hp bars should be cleared too
 

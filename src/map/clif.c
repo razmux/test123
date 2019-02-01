@@ -49,6 +49,7 @@
 #include "achievement.h"
 #include "region.h"
 #include "faction.h"
+#include "oboro.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -59,7 +60,7 @@
 /* for clif_clearunit_delayed */
 static struct eri *delay_clearunit_ers;
 
-//#define DUMP_UNKNOWN_PACKET
+#define DUMP_UNKNOWN_PACKET
 //#define DUMP_INVALID_PACKET
 
 struct Clif_Config {
@@ -722,6 +723,7 @@ int clif_send(const uint8* buf, int len, struct block_list* bl, enum send_target
 	case PARTY_WOS:
 	case PARTY_SAMEMAP:
 	case PARTY_SAMEMAP_WOS:
+	case PARTY_BUFF_INFO:
 		if (sd && sd->status.party_id)
 			p = party_search(sd->status.party_id);
 
@@ -736,10 +738,13 @@ int clif_send(const uint8* buf, int len, struct block_list* bl, enum send_target
 				if( sd->bl.id == bl->id && (type == PARTY_WOS || type == PARTY_SAMEMAP_WOS || type == PARTY_AREA_WOS) )
 					continue;
 
-				if( type != PARTY && type != PARTY_WOS && bl->m != sd->bl.m )
+				if( type != PARTY_BUFF_INFO && type != PARTY && type != PARTY_WOS && bl->m != sd->bl.m )
 					continue;
 
 				if( (type == PARTY_AREA || type == PARTY_AREA_WOS) && (sd->bl.x < x0 || sd->bl.y < y0 || sd->bl.x > x1 || sd->bl.y > y1) )
+					continue;
+
+				if( type == PARTY_BUFF_INFO && !sd->state.spb )
 					continue;
 
 				if( packet_db[sd->packet_ver][RBUFW(buf,0)].len )
@@ -7640,10 +7645,13 @@ void clif_party_member_info(struct party_data *p, struct map_session_data *sd)
 void clif_party_info(struct party_data* p, struct map_session_data *sd)
 {
 	unsigned char buf[2+2+NAME_LENGTH+(4+NAME_LENGTH+MAP_NAME_LENGTH_EXT+1+1)*MAX_PARTY];
-	struct map_session_data* party_sd = NULL;
+	struct map_session_data* party_sd = NULL, *target = NULL;
+	char output[NAME_LENGTH+10];
 	int i, c;
 
 	nullpo_retv(p);
+
+	if(!p) return; // Anti-crash [Oboro]
 
 	WBUFW(buf,0) = 0xfb;
 	memcpy(WBUFP(buf,4), p->party.name, NAME_LENGTH);
@@ -7663,11 +7671,41 @@ void clif_party_info(struct party_data* p, struct map_session_data *sd)
 	}
 	WBUFW(buf,2) = 28+c*46;
 
-	if(sd) { // send only to self
+	if(sd) 
+	{ // send only to self
 		clif_send(buf, WBUFW(buf,2), &sd->bl, SELF);
-	} else if (party_sd) { // send to whole party
+	} else if (party_sd) 
+	{ // send to whole party
 		clif_send(buf, WBUFW(buf,2), &party_sd->bl, PARTY);
 	}
+
+	for(i = 0; i < MAX_PARTY; i++)
+	{
+		if( (target = p->data[i].sd) )
+		{
+			strcpy(output, "[");
+			if( target->sc.data[SC_BLESSING] ) strcat(output,"B");
+				else strcat(output,"_");
+			if( target->sc.data[SC_INCREASEAGI] ) strcat(output,"A");
+				else strcat(output,"_");
+			if( target->sc.data[SC_CP_WEAPON] && target->sc.data[SC_CP_SHIELD] &&
+				target->sc.data[SC_CP_ARMOR] && target->sc.data[SC_CP_HELM] ) strcat(output,"F");
+				else strcat(output,"_");
+			if( target->sc.data[SC_SPIRIT] ) strcat(output,"S");
+				else strcat(output,"_");
+			if( target->sc.data[SC_DEVOTION] ) strcat(output,"+");
+				else strcat(output,"_");
+			strcat(output, "]");
+			strncat(output, p->data[i].sd->status.name, NAME_LENGTH);
+			safestrncpy((char*)WBUFP(buf,28+i*46+4), output, NAME_LENGTH);
+		}
+	}
+
+	if( sd && sd->state.spb )
+		clif_send(buf, WBUFW(buf,2), &sd->bl, SELF);
+	else if( party_sd )
+		clif_send(buf, WBUFW(buf,2), &party_sd->bl, PARTY_BUFF_INFO);
+
 }
 
 
@@ -9635,6 +9673,9 @@ void clif_refresh(struct map_session_data *sd)
 {
 	nullpo_retv(sd);
 
+	if ( sub_refresh(sd) < 0 ) // [Oboro]
+		return;
+
 	clif_changemap(sd,sd->bl.m,sd->bl.x,sd->bl.y);
 	clif_inventorylist(sd);
 	if(pc_iscarton(sd)) {
@@ -11478,7 +11519,7 @@ void clif_parse_ActionRequest_sub(struct map_session_data *sd, int action_type, 
 		clif_clearunit_area(&sd->bl, CLR_DEAD);
 		return;
 	}
-
+	
 	// Statuses that don't let the player sit / attack / talk with NPCs(targeted)
 	// (not all are included in pc_can_attack)
 	if (sd->sc.count &&
@@ -12559,7 +12600,7 @@ void clif_parse_UseSkillToId(int fd, struct map_session_data *sd)
 	int inf,target_id;
 	unsigned int tick = gettick();
 	struct s_packet_db* info = &packet_db[sd->packet_ver][RFIFOW(fd,0)];
-
+	
 	skill_lv = RFIFOW(fd,info->pos[0]);
 	skill_id = RFIFOW(fd,info->pos[1]);
 	target_id = RFIFOL(fd,info->pos[2]);
@@ -12700,7 +12741,7 @@ void clif_parse_UseSkillToId(int fd, struct map_session_data *sd)
 static void clif_parse_UseSkillToPosSub(int fd, struct map_session_data *sd, uint16 skill_lv, uint16 skill_id, short x, short y, int skillmoreinfo)
 {
 	unsigned int tick = gettick();
-
+	
 	if( !(skill_get_inf(skill_id)&INF_GROUND_SKILL) )
 		return; //Using a target skill on the ground? WRONG.
 
@@ -15088,6 +15129,7 @@ void clif_parse_FriendsListReply(int fd, struct map_session_data *sd)
 
 /// Request to delete a friend (CZ_DELETE_FRIENDS).
 /// 0203 <account id>.L <char id>.L
+// [Oboro] Emulator: Fix'd WOE BUG
 void clif_parse_FriendsListRemove(int fd, struct map_session_data *sd)
 {
 	struct map_session_data *f_sd = NULL;
@@ -15108,7 +15150,8 @@ void clif_parse_FriendsListRemove(int fd, struct map_session_data *sd)
 	}
 
 	//remove from friend's list first
-	if( (f_sd = map_id2sd(account_id)) && f_sd->status.char_id == char_id) {
+	if( (f_sd = map_id2sd(account_id)) && f_sd->status.char_id == char_id) 
+	{
 		for (i = 0; i < MAX_FRIENDS &&
 			(f_sd->status.friends[i].char_id != sd->status.char_id || f_sd->status.friends[i].account_id != sd->status.account_id); i++);
 
@@ -16381,7 +16424,7 @@ void clif_parse_Auction_buysell(int fd, struct map_session_data* sd)
 	intif_Auction_requestlist(sd->status.char_id, type, 0, "", 1);
 }
 
-static int clif_min_badges(struct map_session_data *sd)
+/*static int clif_min_badges(struct map_session_data *sd)
 {
 	int i, i7828 = 0, i7829 = 0, i7773 = 0;
 	if( !sd ) return 0;
@@ -16394,7 +16437,7 @@ static int clif_min_badges(struct map_session_data *sd)
 	if( i >= 0 ) i7773 = sd->status.inventory[i].amount;
 
 	return min(min(i7828,i7829),i7773);
-}
+}*/
 
 /// CASH/POINT SHOP
 ///
