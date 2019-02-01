@@ -265,11 +265,6 @@ struct map_session_data {
 		unsigned int evade_antiwpefilter : 1; // Required sometimes to show the user previous to use the skill
 		unsigned int bg_afk : 1; // Moved here to reduce searchs
 		unsigned int bg_listen : 1;
-		unsigned int spb : 1; // @spb / @partybuff [Oboro]
-		unsigned int restock : 1; // [Oboro]
-		unsigned int afk : 1; // [Oboro]
-		unsigned int oboro_showinfo : 1; // [Oboro]
-		unsigned int hold : 1; // [Oboro]
 	} state;
 	struct {
 		unsigned char no_weapon_damage, no_magic_damage, no_misc_damage;
@@ -1374,8 +1369,6 @@ void pc_validate_skill(struct map_session_data *sd);
 
 void pc_show_questinfo(struct map_session_data *sd);
 void pc_show_questinfo_reinit(struct map_session_data *sd);
-
-int pc_getitem_map(struct map_session_data *sd,struct item it,int amt,int count,e_log_pick_type log_type);
 
 #if defined(RENEWAL_DROP) || defined(RENEWAL_EXP)
 int pc_level_penalty_mod(int level_diff, uint32 mob_class, enum e_mode mode, int type);

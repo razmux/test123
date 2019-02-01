@@ -1243,7 +1243,6 @@ int npc_click(struct map_session_data* sd, struct npc_data* nd)
 		case NPCTYPE_CASHSHOP:
 		case NPCTYPE_ITEMSHOP:
 		case NPCTYPE_POINTSHOP:
-		case NPCTYPE_COSTUMESHOP:
 			clif_cashshop_show(sd,nd);
 			break;
 		case NPCTYPE_MARKETSHOP:
@@ -1372,7 +1371,7 @@ int npc_cashshop_buylist(struct map_session_data *sd, int points, int count, uns
 	unsigned short nameid;
 	struct npc_data *nd = (struct npc_data *)map_id2bl(sd->npc_shopid);
 
-	if( !nd || ( nd->subtype != NPCTYPE_CASHSHOP && nd->subtype != NPCTYPE_ITEMSHOP && nd->subtype != NPCTYPE_POINTSHOP && nd->subtype != NPCTYPE_COSTUMESHOP ) )
+	if( !nd || ( nd->subtype != NPCTYPE_CASHSHOP && nd->subtype != NPCTYPE_ITEMSHOP && nd->subtype != NPCTYPE_POINTSHOP ) )
 		return ERROR_TYPE_NPC;
 	if( sd->state.trading )
 		return ERROR_TYPE_EXCHANGE;
@@ -1431,7 +1430,6 @@ int npc_cashshop_buylist(struct map_session_data *sd, int points, int count, uns
 			pc_paycash(sd, vt, points, LOG_TYPE_NPC);
 			break;
 		case NPCTYPE_ITEMSHOP:
-		case NPCTYPE_COSTUMESHOP:
 		{
 			struct item_data *id = itemdb_exists(nd->u.shop.itemshop_nameid);
 
@@ -1481,13 +1479,6 @@ int npc_cashshop_buylist(struct map_session_data *sd, int points, int count, uns
 			item_tmp.nameid = nameid;
 			item_tmp.identify = 1;
 
-			if ( nd->subtype == NPCTYPE_COSTUMESHOP ) 
-			{
-				item_tmp.card[0] = CARD0_CREATE;
-				item_tmp.card[2] = GetWord(battle_config.costume_reserved_char_id, 0);
-				item_tmp.card[3] = GetWord(battle_config.costume_reserved_char_id, 1);
-			}
-
 			if ((itemdb_search(nameid))->flag.guid)
 				get_amt = 1;
 
@@ -1522,7 +1513,6 @@ void npc_shop_currency_type(struct map_session_data *sd, struct npc_data *nd, in
 			cost[1] = sd->kafraPoints;
 			break;
 		case NPCTYPE_ITEMSHOP:
-		case NPCTYPE_COSTUMESHOP:
 		{
 			int total = 0, i;
 			struct item_data *id = itemdb_exists(nd->u.shop.itemshop_nameid);
@@ -2094,7 +2084,7 @@ int npc_unload(struct npc_data* nd, bool single) {
 	if( single && nd->bl.m != -1 )
 		map_remove_questinfo(nd->bl.m, nd);
 
-	if( (nd->subtype == NPCTYPE_SHOP || nd->subtype == NPCTYPE_CASHSHOP || nd->subtype == NPCTYPE_COSTUMESHOP || nd->subtype == NPCTYPE_ITEMSHOP || nd->subtype == NPCTYPE_POINTSHOP || nd->subtype == NPCTYPE_MARKETSHOP) && nd->src_id == 0) //src check for duplicate shops [Orcao]
+	if( (nd->subtype == NPCTYPE_SHOP || nd->subtype == NPCTYPE_CASHSHOP || nd->subtype == NPCTYPE_ITEMSHOP || nd->subtype == NPCTYPE_POINTSHOP || nd->subtype == NPCTYPE_MARKETSHOP) && nd->src_id == 0) //src check for duplicate shops [Orcao]
 		aFree(nd->u.shop.shop_item);
 	else if( nd->subtype == NPCTYPE_SCRIPT ) {
 		struct s_mapiterator* iter;
@@ -2514,7 +2504,6 @@ static const char* npc_parse_warp(char* w1, char* w2, char* w3, char* w4, const 
  * <map name>,<x>,<y>,<facing>%TAB%shop%TAB%<NPC Name>%TAB%<sprite id>,<itemid>:<price>{,<itemid>:<price>...}
  * <map name>,<x>,<y>,<facing>%TAB%cashshop%TAB%<NPC Name>%TAB%<sprite id>,<itemid>:<price>{,<itemid>:<price>...}
  * <map name>,<x>,<y>,<facing>%TAB%itemshop%TAB%<NPC Name>%TAB%<sprite id>,<costitemid>{:<discount>},<itemid>:<price>{,<itemid>:<price>...}
- * <map name>,<x>,<y>,<facing>%TAB%costumeshop%TAB%<NPC Name>%TAB%<sprite id>,<costitemid>{:<discount>},<itemid>:<price>{,<itemid>:<price>...}
  * <map name>,<x>,<y>,<facing>%TAB%pointshop%TAB%<NPC Name>%TAB%<sprite id>,<costvariable>{:<discount>},<itemid>:<price>{,<itemid>:<price>...}
  * <map name>,<x>,<y>,<facing>%TAB%marketshop%TAB%<NPC Name>%TAB%<sprite id>,<itemid>:<price>:<quantity>{,<itemid>:<price>:<quantity>...}
  * @param w1 : word 1 before tab (<from map name>,<x>,<y>,<facing>)
@@ -2566,8 +2555,6 @@ static const char* npc_parse_shop(char* w1, char* w2, char* w3, char* w4, const 
 		type = NPCTYPE_POINTSHOP;
 	else if( !strcasecmp(w2, "marketshop") )
 		type = NPCTYPE_MARKETSHOP;
-	else if( !strcasecmp(w2,"costumeshop") )
-		type = NPCTYPE_COSTUMESHOP;
 	else
 		type = NPCTYPE_SHOP;
 
@@ -2575,9 +2562,7 @@ static const char* npc_parse_shop(char* w1, char* w2, char* w3, char* w4, const 
 	memset(point_str,'\0',sizeof(point_str));
 
 	switch(type) {
-		case NPCTYPE_COSTUMESHOP:
-		case NPCTYPE_ITEMSHOP: 
-		{
+		case NPCTYPE_ITEMSHOP: {
 			if (sscanf(p,",%5hu:%11d,",&nameid,&is_discount) < 1) {
 				ShowError("npc_parse_shop: Invalid item cost definition in file '%s', line '%d'. Ignoring the rest of the line...\n * w1=%s\n * w2=%s\n * w3=%s\n * w4=%s\n", filepath, strline(buffer,start-buffer), w1, w2, w3, w4);
 				return strchr(start,'\n'); // skip and continue
@@ -2712,7 +2697,7 @@ static const char* npc_parse_shop(char* w1, char* w2, char* w3, char* w4, const 
 	}
 
 	if (type != NPCTYPE_SHOP) {
-		if (type == NPCTYPE_ITEMSHOP || type == NPCTYPE_COSTUMESHOP ) nd->u.shop.itemshop_nameid = nameid; // Item shop currency
+		if (type == NPCTYPE_ITEMSHOP) nd->u.shop.itemshop_nameid = nameid; // Item shop currency
 		else if (type == NPCTYPE_POINTSHOP) safestrncpy(nd->u.shop.pointshop_str,point_str,strlen(point_str)+1); // Point shop currency
 		nd->u.shop.discount = is_discount;
 	}
@@ -2766,7 +2751,7 @@ bool npc_shop_discount(enum npc_subtype type, bool discount) {
 	if (type == NPCTYPE_SHOP || (type != NPCTYPE_SHOP && discount))
 		return true;
 
-	if( ((type == NPCTYPE_ITEMSHOP || type == NPCTYPE_COSTUMESHOP) && battle_config.discount_item_point_shop&1) ||
+	if( (type == NPCTYPE_ITEMSHOP && battle_config.discount_item_point_shop&1) ||
 		(type == NPCTYPE_POINTSHOP && battle_config.discount_item_point_shop&2) )
 		return true;
 	return false;
@@ -3064,8 +3049,8 @@ const char* npc_parse_duplicate(char* w1, char* w2, char* w3, char* w4, const ch
 	src_id = dnd->bl.id;
 	type = dnd->subtype;
 
-	// get placement [Oboro] CostumeShop
-	if ((type == NPCTYPE_SHOP || type == NPCTYPE_CASHSHOP || type == NPCTYPE_COSTUMESHOP || type == NPCTYPE_ITEMSHOP || type == NPCTYPE_POINTSHOP || type == NPCTYPE_SCRIPT || type == NPCTYPE_MARKETSHOP) && strcmp(w1, "-") == 0) {// floating shop/chashshop/itemshop/pointshop/script
+	// get placement
+	if ((type == NPCTYPE_SHOP || type == NPCTYPE_CASHSHOP || type == NPCTYPE_ITEMSHOP || type == NPCTYPE_POINTSHOP || type == NPCTYPE_SCRIPT || type == NPCTYPE_MARKETSHOP) && strcmp(w1, "-") == 0) {// floating shop/chashshop/itemshop/pointshop/script
 		x = y = dir = 0;
 		m = -1;
 	} else {
@@ -3114,7 +3099,6 @@ const char* npc_parse_duplicate(char* w1, char* w2, char* w3, char* w4, const ch
 
 		case NPCTYPE_SHOP:
 		case NPCTYPE_CASHSHOP:
-		case NPCTYPE_COSTUMESHOP:
 		case NPCTYPE_ITEMSHOP:
 		case NPCTYPE_POINTSHOP:
 		case NPCTYPE_MARKETSHOP:
@@ -3956,9 +3940,9 @@ static const char* npc_parse_mapflag(char* w1, char* w2, char* w3, char* w4, con
 	else if (!strcmpi(w3,"pvp_event"))
 	{
 		int x1, y1, x2, y2;
-		if(state == 0)
-			; //Map flag disabled [Fix] Isaac
-		else if(sscanf(w4, "%d,%d,%d,%d", &x1, &y1, &x2, &y2) == 4)
+		if( state == 0 )
+			;
+		if( sscanf(w4, "%d,%d,%d,%d", &x1, &y1, &x2, &y2) == 4 )
 		{
 			if( x1 > x2 ) swap(x1, x2);
 			if( y1 > y2 ) swap(y1, y2);
@@ -4308,10 +4292,6 @@ static const char* npc_parse_mapflag(char* w1, char* w2, char* w3, char* w4, con
 		map[m].flag.nolockon = state;
 	else if (!strcmpi(w3,"notomb"))
 		map[m].flag.notomb = state;
-	else if (!strcmpi(w3,"nodiscount")) // [Oboro]
-		map[m].flag.nodiscount=state;
-	else if (!strcmpi(w3,"guild_min")) // [Oboro]
-		map[m].flag.guild_min =state;
 	else if (!strcmpi(w3,"skill_damage")) {
 #ifdef ADJUST_SKILL_DAMAGE
 		char skill[SKILL_NAME_LENGTH];
@@ -4522,7 +4502,7 @@ int npc_parsesrcfile(const char* filepath, bool runOnInit)
 
 		if( strcasecmp(w2,"warp") == 0 && count > 3 )
 			p = npc_parse_warp(w1,w2,w3,w4, p, buffer, filepath);
-		else if( (!strcasecmp(w2,"shop") || !strcasecmp(w2,"cashshop") || !strcasecmp(w2,"itemshop") || !strcasecmp(w2,"costumeshop") || !strcasecmp(w2,"pointshop") || !strcasecmp(w2,"marketshop") ) && count > 3 )
+		else if( (!strcasecmp(w2,"shop") || !strcasecmp(w2,"cashshop") || !strcasecmp(w2,"itemshop") || !strcasecmp(w2,"pointshop") || !strcasecmp(w2,"marketshop") ) && count > 3 )
 			p = npc_parse_shop(w1,w2,w3,w4, p, buffer, filepath);
 		else if( strcasecmp(w2,"script") == 0 && count > 3 ) {
 			if( strcasecmp(w1,"function") == 0 )

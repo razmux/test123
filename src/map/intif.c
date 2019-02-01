@@ -2738,7 +2738,7 @@ static void intif_parse_Auction_bid(int fd)
 static void intif_parse_Auction_data(int fd)
 {
 	struct auction_data auction;
-	//unsigned char result = RFIFOB(fd,4);
+	unsigned char result = RFIFOB(fd,4);
 
 	if( RFIFOW(fd,2) - 5 != sizeof(struct auction_data) )
 	{
@@ -3310,7 +3310,6 @@ int intif_parse(int fd)
 	case 0x383f:	intif_parse_GuildEmblem(fd); break;
 	case 0x3840:	intif_parse_GuildCastleDataLoad(fd); break;
 	case 0x3843:	intif_parse_GuildMasterChanged(fd); break;
-	case 0x3842:
 	case 0x3844:	intif_parse_Guild_score_saved(fd); break;
 
 	// Mail System

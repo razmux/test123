@@ -40,7 +40,6 @@
 #include "faction.h"
 #include "cashshop.h"
 #include "channel.h"
-#include "oboro.h"
 
 #include <stdlib.h>
 #include <math.h>
@@ -4817,7 +4816,6 @@ int do_init(int argc, char *argv[])
 	do_init_achievement();
 	do_init_faction();
 	do_init_region();
-	do_init_oboro(); //[Isaac] Oboro Emulator
 
 	npc_event_do_oninit();	// Init npcs (OnInit)
 
