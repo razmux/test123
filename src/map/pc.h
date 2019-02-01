@@ -270,7 +270,6 @@ struct map_session_data {
 		unsigned int afk : 1; // [Oboro]
 		unsigned int oboro_showinfo : 1; // [Oboro]
 		unsigned int hold : 1; // [Oboro]
-
 	} state;
 	struct {
 		unsigned char no_weapon_damage, no_magic_damage, no_misc_damage;
@@ -1087,9 +1086,6 @@ uint64 pc_generate_unique_id(struct map_session_data *sd);
 //Bound items
 int pc_bound_chk(TBL_PC *sd,enum bound_type type,int *idxlist);
 
-int pc_getitem_map(struct map_session_data *sd,struct item it,int amt,int count,e_log_pick_type log_type); // [Xantara]
-
-
 // Special Shop System
 int pc_paycash( struct map_session_data *sd, int price, int points, e_log_pick_type type );
 int pc_getcash( struct map_session_data *sd, int cash, int points, e_log_pick_type type );
@@ -1378,6 +1374,8 @@ void pc_validate_skill(struct map_session_data *sd);
 
 void pc_show_questinfo(struct map_session_data *sd);
 void pc_show_questinfo_reinit(struct map_session_data *sd);
+
+int pc_getitem_map(struct map_session_data *sd,struct item it,int amt,int count,e_log_pick_type log_type);
 
 #if defined(RENEWAL_DROP) || defined(RENEWAL_EXP)
 int pc_level_penalty_mod(int level_diff, uint32 mob_class, enum e_mode mode, int type);

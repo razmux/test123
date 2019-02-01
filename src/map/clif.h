@@ -995,9 +995,6 @@ void clif_aura_reload(void);
 // Extended Vending
 int clif_vend(struct map_session_data *sd, int skill_lv);
 
-bool clif_skill_effect_hide(struct map_session_data *sd, const uint8* buf); //DP
-
-
 void clif_display_pinfo(struct map_session_data *sd, int type);
 
 /// Roulette
@@ -1065,10 +1062,5 @@ void clif_broadcast_obtain_special_item(const char *char_name, unsigned short na
 void clif_dressing_room(struct map_session_data *sd, int flag);
 void clif_navigateTo(struct map_session_data *sd, const char* mapname, uint16 x, uint16 y, uint8 flag, bool hideWindow, uint16 mob_id );
 void clif_SelectCart(struct map_session_data *sd);
-
-
-// Gepard Shield
-bool clif_gepard_process_packet(struct map_session_data* sd);
-// Gepard Shield
 
 #endif /* _CLIF_H_ */

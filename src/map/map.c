@@ -4819,7 +4819,6 @@ int do_init(int argc, char *argv[])
 	do_init_region();
 	do_init_oboro(); //[Isaac] Oboro Emulator
 
-
 	npc_event_do_oninit();	// Init npcs (OnInit)
 
 	if (battle_config.pk_mode)

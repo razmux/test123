@@ -8,7 +8,6 @@
 #include "../config/core.h"
 #include "clif.h" // e_damage_type
 #include "map.h" //ELE_MAX
-#include "mapreg.h"
 
 /// State of a single attack attempt; used in flee/def penalty calculations when mobbed
 typedef enum damage_lv {
@@ -544,8 +543,7 @@ extern struct Battle_Config
 	int bg_kafrapoints; 	//[Oboro]
 	int bg_event_extra_badges; //[Oboro]
 	int bg_win_badges; 		//[Oboro]
-	int bg_ranking_bonus;
-
+	
 	int bg_ranked_mode;
 	int bg_ranked_max_games;
 	int bg_reportafk_leaderonly;

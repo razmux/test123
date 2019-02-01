@@ -276,7 +276,6 @@ enum npc_subtype {
 	NPCTYPE_TOMB, /// Monster tomb
 	NPCTYPE_MARKETSHOP, /// Marketshop
 	NPCTYPE_COSTUMESHOP, // [Oboro] Costume Shop
-
 };
 
 enum e_race {

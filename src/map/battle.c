@@ -4443,7 +4443,6 @@ struct Damage battle_attack_sc_bonus(struct Damage wd, struct block_list *src, s
 	struct map_session_data *sd = BL_CAST(BL_PC, src);
 	struct status_change *sc = status_get_sc(src);
 	struct status_data *sstatus = status_get_status_data(src);
-	struct status_data *tstatus = status_get_status_data(target);
 	int inf3 = skill_get_inf3(skill_id);
 
 	// Kagerou/Oboro Earth Charm effect +15% wATK
@@ -4467,7 +4466,10 @@ struct Damage battle_attack_sc_bonus(struct Damage wd, struct block_list *src, s
 			ATK_ADD(wd.equipAtk, wd.equipAtk2, sc->data[SC_DRUMBATTLE]->val2);
 		if (sc->data[SC_MADNESSCANCEL])
 			ATK_ADD(wd.equipAtk, wd.equipAtk2, 100);
-		if (sc->data[SC_GATLINGFEVER]) {
+		if (sc->data[SC_GATLINGFEVER]) 
+		{
+			struct status_data *tstatus = status_get_status_data(target);
+			
 			if (tstatus->size == SZ_SMALL) {
 				ATK_ADD(wd.equipAtk, wd.equipAtk2, 10 * sc->data[SC_GATLINGFEVER]->val1);
 			} else if (tstatus->size == SZ_MEDIUM) {
@@ -7606,7 +7608,6 @@ int battle_check_target( struct block_list *src, struct block_list *target,int f
 	if( flag&BCT_ENEMY && (map_getcell(m,src->x,src->y,CELL_CHKBASILICA) || map_getcell(m,target->x,target->y,CELL_CHKBASILICA)) )
 		return -1;
 
-
 	//t_bl/s_bl hold the 'master' of the attack, while src/target are the actual
 	//objects involved.
 	if( (t_bl = battle_get_master(target)) == NULL )
@@ -7614,15 +7615,6 @@ int battle_check_target( struct block_list *src, struct block_list *target,int f
 
 	if( (s_bl = battle_get_master(src)) == NULL )
 		s_bl = src;
-
-	if ( s_bl->type == BL_PC && t_bl->type == BL_MOB ) {
-		struct map_session_data *sd = BL_CAST(BL_PC, s_bl);
-      if ( ( ((TBL_MOB*)target)->mob_id == 3005 && (!strcmp( mapindex_id2name(sd->mapindex), "guild_vs1" ) || !strcmp( mapindex_id2name(sd->mapindex), "pvp_n_4-5" ) || !strcmp( mapindex_id2name(sd->mapindex), "pvp_n_2-5")) ) &&
-         ( sd->status.guild_id == mapreg_readreg( add_str("$koegid") ) || battle_getcurrentskill(src) > 0 ) )
-		return 0;
-	}
-
-
 
 	if ( s_bl->type == BL_PC ) {
 		switch( t_bl->type ) {
@@ -8470,7 +8462,6 @@ static const struct _battle_data {
 	{ "bg_reserved_char_id",                &battle_config.bg_reserved_char_id,             999996, 0,      INT_MAX,        },
 	{ "bg_items_on_pvp",                    &battle_config.bg_items_on_pvp,                 1,      0,      1,              },
 	{ "bg_reward_rates",                    &battle_config.bg_reward_rates,                 100,    0,      INT_MAX,        },
-	{ "bg_ranking_bonus",                   &battle_config.bg_ranking_bonus,                0,      0,      100,            },
 	{ "bg_ranked_mode",                     &battle_config.bg_ranked_mode,                  0,      0,      1,              },
 	{ "bg_ranked_max_games",                &battle_config.bg_ranked_max_games,             50,     10,     100,            },
 	{ "bg_reportafk_leaderonly",            &battle_config.bg_reportafk_leaderonly,         1,      0,      1,              },
@@ -8483,6 +8474,7 @@ static const struct _battle_data {
 	{ "bg_kafrapoints",                 	&battle_config.bg_kafrapoints,      		    0,      0,      INT_MAX,        }, //[Oboro]
 	{ "bg_event_extra_badges", 	            &battle_config.bg_event_extra_badges,      		0,      0,      INT_MAX,        }, //[Oboro]
 	{ "bg_win_badges", 	     		        &battle_config.bg_win_badges,      			    0,      0,      INT_MAX,        }, //[Oboro]
+
 // Faction System
 	{ "faction_allow_party",                &battle_config.faction_allow_party,             1,      0,      1,              },
 	{ "faction_allow_guild",                &battle_config.faction_allow_guild,             1,      0,      1,              },
@@ -8530,9 +8522,10 @@ static const struct _battle_data {
 	{ "reflect_damage_fix",                 &battle_config.reflect_damage_fix,              1|2,    0,      1|2,            },
 
 	{ "anti_mayapurple_hack",               &battle_config.anti_mayapurple_hack,            0,      0,      1,              },
-	{ "use_aegis_land_shower",              &battle_config.use_aegis_land_shower,	    0,	     0,      1,              },// [Oboro]
-	{ "min_guild",                          &battle_config.min_guild,                       0,      0,      INT_MAX,        },// [Oboro]
-	{ "oboro_enable",			     &battle_config.oboro_enable,			    1,	     0,      INT_MAX,        },// [Oboro]
+
+	{ "use_aegis_land_shower",              &battle_config.use_aegis_land_shower,			0,		0,		1,				},// [Oboro]
+	{ "min_guild",                        	&battle_config.min_guild,                     	0,      0,      INT_MAX,        },// [Oboro]
+	{ "oboro_enable",						&battle_config.oboro_enable,					1,		0,		INT_MAX,		},// [Oboro]
 
 	// Premium Account System
 	{ "premium_group_id",                   &battle_config.premium_group_id,                0,      0,      INT_MAX,        },

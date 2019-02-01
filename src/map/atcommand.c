@@ -1,4 +1,4 @@
-// Copyright (c) Athena Dev Teams - Licensed under GNU GPL
+ï»¿// Copyright (c) Athena Dev Teams - Licensed under GNU GPL
 // For more information, see LICENCE in the main folder
 
 #include "../common/cbasetypes.h"
@@ -1216,7 +1216,6 @@ ACMD_FUNC(heal)
 	return 0;
 }
 
-
 /*==========================================
  * @item command (usage: @item <itemdid1:itemid2:itemname:..> <quantity>) (modified by [Yor] for pet_egg)
  * @itembound command (usage: @itembound <name/id_of_item> <quantity> <bound_type>)
@@ -1324,6 +1323,7 @@ ACMD_FUNC(item)
 		clif_displaymessage(fd, msg_txt(sd,18)); // Item created.
 	return 0;
 }
+
 /*==========================================
  *
  *------------------------------------------*/
@@ -1924,54 +1924,42 @@ ACMD_FUNC(go)
 		char map[MAP_NAME_LENGTH];
 		int x, y;
 	} data[] = {
-		{ MAP_PRONTERA,    156, 191 }, //  0=Prontera
-		{ MAP_MORROC,      156,  93 }, //  1=Morroc
-		{ MAP_GEFFEN,      119,  59 }, //  2=Geffen
-		{ MAP_PAYON,       162, 233 }, //  3=Payon
-		{ MAP_ALBERTA,     192, 147 }, //  4=Alberta
-#ifdef RENEWAL
-		{ MAP_IZLUDE,      128, 146 }, //  5=Izlude (Renewal)
-#else
-		{ MAP_IZLUDE,      128, 114 }, //  5=Izlude
-#endif
-		{ MAP_ALDEBARAN,   140, 131 }, //  6=Al de Baran
-		{ MAP_LUTIE,       147, 134 }, //  7=Lutie
-		{ MAP_COMODO,      209, 143 }, //  8=Comodo
-		{ MAP_YUNO,        157,  51 }, //  9=Yuno
-		{ MAP_AMATSU,      198,  84 }, // 10=Amatsu
-		{ MAP_GONRYUN,     160, 120 }, // 11=Gonryun
-		{ MAP_UMBALA,       89, 157 }, // 12=Umbala
-		{ MAP_NIFLHEIM,     21, 153 }, // 13=Niflheim
-		{ MAP_LOUYANG,     217,  40 }, // 14=Louyang
-#ifdef RENEWAL
-		{ MAP_NOVICE,       52, 35  }, // 15=Training Grounds (Renewal)
-#else
-		{ MAP_NOVICE,       52, 35 }, // 15=Training Grounds
-#endif
-		{ MAP_JAIL,         23,  61 }, // 16=Prison
-		{ MAP_JAWAII,      216, 231 }, // 17=Jawaii
-		{ MAP_AYOTHAYA,    151, 117 }, // 18=Ayothaya
-		{ MAP_EINBROCH,     64, 200 }, // 19=Einbroch
-		{ MAP_LIGHTHALZEN, 158,  92 }, // 20=Lighthalzen
-		{ MAP_EINBECH,      70,  95 }, // 21=Einbech
-		{ MAP_HUGEL,        96, 145 }, // 22=Hugel
-		{ MAP_RACHEL,      130, 110 }, // 23=Rachel
-		{ MAP_VEINS,       216, 123 }, // 24=Veins
-		{ MAP_MOSCOVIA,    223, 184 }, // 25=Moscovia
-		{ MAP_MIDCAMP,     180, 240 }, // 26=Midgard Camp
-		{ MAP_MANUK,       282, 138 }, // 27=Manuk
-		{ MAP_SPLENDIDE,   201, 147 }, // 28=Splendide
-		{ MAP_BRASILIS,    182, 239 }, // 29=Brasilis
-		{ MAP_DICASTES,    198, 187 }, // 30=El Dicastes
-		{ MAP_MORA,         44, 151 }, // 31=Mora
-		{ MAP_DEWATA,      200, 180 }, // 32=Dewata
-		{ MAP_MALANGDO,    140, 114 }, // 33=Malangdo Island
-		{ MAP_MALAYA,      242, 211 }, // 34=Malaya Port
-		{ MAP_ECLAGE,      110,  39 }, // 35=Eclage
-		{ MAP_MERCADOCASH,  179,  81},  // 36
-		{ MAP_MERCADOZENY,  100, 13 },  // 37
-		{ MAP_MERCADONPC,  151, 166 },  // 38
-		{ MAP_ZONAJUEGOS,  15, 116  },  // 39
+		{ MAP_PRONTERA,		155, 187 }, // 0 = Prontera
+		{ MAP_MORROC,		157,  93 },
+		{ MAP_GEFFEN,		120,  70 },
+		{ MAP_PAYON,		172, 101 },
+		{ MAP_ALBERTA,		117,  57 },
+		{ MAP_IZLUDE,		128, 144 },
+		{ MAP_ALDEBARAN,	140, 121 },
+		{ MAP_LUTIE,		147, 134 },
+		{ MAP_COMODO,		189, 147 },
+		{ MAP_YUNO,			158, 196 },
+		{ MAP_AMATSU,		224, 229 }, // 10 = Amatsu
+		{ MAP_GONRYUN,		159, 119 },
+		{ MAP_UMBALA,		144, 160 },
+		{ MAP_NIFLHEIM,		21, 153  },
+		{ MAP_LOUYANG,		217, 105 },
+		{ MAP_ITEMMALL,		251, 340 },
+		{ MAP_JAWAII,		249, 127 },
+		{ MAP_AYOTHAYA,		208, 193 },
+		{ MAP_EINBROCH,		 64, 200 },
+		{ MAP_LIGHTHALZEN,	158,  92 },
+		{ MAP_EINBECH,		 70,  95 }, // 20 = Einbech
+		{ MAP_HUGEL,		 96, 145 },
+		{ MAP_RACHEL,		113, 137 },
+		{ MAP_VEINS,		216, 123 },
+		{ MAP_MOSCOVIA,		223, 191 },
+		{ MAP_MANUK,		267, 196 },
+		{ MAP_SPLENDIDE,	200, 150 },
+		{ MAP_BRASILIS,		196, 217 },
+		{ MAP_MID_CAMP,		218, 236 },
+		{ MAP_DICASTES01,	197, 193 },
+		{ MAP_DEWATA,		200, 179 }, // 30 = Dewata
+		{ MAP_MALANGDO,		167, 135 },
+		{ MAP_MORA,			110, 104 },
+		{ MAP_ALBERTA,		103, 195 },
+		{ MAP_AYOTHAYA,		151, 161 },
+		{ MAP_WOE,			49,  49, },
 	};
 
 	nullpo_retr(-1, sd);
@@ -2051,59 +2039,50 @@ ACMD_FUNC(go)
 		town = 13;
 	} else if (strncmp(map_name, "louyang", 3) == 0) {
 		town = 14;
-	} else if (strncmp(map_name, "novice", 3) == 0) {
+	} else if (strncmp(map_name, "itemmall", 6) == 0 ||
+	           strncmp(map_name, "mall", 3) == 0) {
 		town = 15;
-	} else if (strncmp(map_name, "sec_pri", 3) == 0 ||
-	           strncmp(map_name, "prison", 3) == 0 ||
-	           strncmp(map_name, "jail", 3) == 0) {
-		town = 16;
 	} else if (strncmp(map_name, "jawaii", 3) == 0) {
-		town = 17;
+		town = 16;
 	} else if (strncmp(map_name, "ayothaya", 3) == 0) {
-		town = 18;
+		town = 17;
 	} else if (strncmp(map_name, "einbroch", 5) == 0) {
-		town = 19;
+		town = 18;
 	} else if (strncmp(map_name, "lighthalzen", 3) == 0) {
-		town = 20;
+		town = 19;
 	} else if (strncmp(map_name, "einbech", 5) == 0) {
-		town = 21;
+		town = 20;
 	} else if (strncmp(map_name, "hugel", 3) == 0) {
-		town = 22;
+		town = 21;
 	} else if (strncmp(map_name, "rachel", 3) == 0) {
-		town = 23;
+		town = 22;
 	} else if (strncmp(map_name, "veins", 3) == 0) {
-		town = 24;
+		town = 23;
 	} else if (strncmp(map_name, "moscovia", 3) == 0) {
-		town = 25;
-	} else if (strncmp(map_name, "mid_camp", 3) == 0) {
-		town = 26;
+		town = 24;
 	} else if (strncmp(map_name, "manuk", 3) == 0) {
-		town = 27;
+		town = 25;
 	} else if (strncmp(map_name, "splendide", 3) == 0) {
-		town = 28;
+		town = 26;
 	} else if (strncmp(map_name, "brasilis", 3) == 0) {
-		town = 29;
+		town = 27;
+	} else if (strncmp(map_name, "mid_camp", 3) == 0) {
+		town = 28;
 	} else if (strncmp(map_name, "dicastes01", 3) == 0) {
-		town = 30;
-	} else if (strcmp(map_name,  "mora") == 0) {
-		town = 31;
+		town = 29;
 	} else if (strncmp(map_name, "dewata", 3) == 0) {
-		town = 32;
+		town = 30;
 	} else if (strncmp(map_name, "malangdo", 5) == 0) {
+		town = 31;
+	} else if (strcmp(map_name,  "mora") == 0) {
+		town = 32;
+	} else if (strncmp(map_name, "merc", 4) == 0) {
 		town = 33;
-	} else if (strncmp(map_name, "malaya", 5) == 0) {
-		town = 34;
 	} else if (strncmp(map_name, "eclage", 3) == 0) {
+		town = 34;
+	} else if (strncmp(map_name, "woe", 3) == 0) {
 		town = 35;
-	} else if (strncmp(map_name, "Mercado Cash", 3) == 0) {
-		town = 36;
-	} else if (strncmp(map_name, "Mercado Zeny", 3) == 0) {
-		town = 37;
-	} else if (strncmp(map_name, "Mercado npc", 3) == 0) {
-		town = 38;
-	} else if (strncmp(map_name, "Sala de juegos", 3) == 0) {
-		town = 39;
-	}
+}
 
 	if (town >= 0 && town < ARRAYLENGTH(data))
 	{
@@ -7342,14 +7321,16 @@ ACMD_FUNC(mobinfo)
 		clif_displaymessage(fd, msg_txt(sd,1245)); //  Drops:
 		strcpy(atcmd_output, " ");
 		j = 0;
-		for (i = 0; i < MAX_MOB_DROP; i++) {
+		for (i = 0; i < MAX_MOB_DROP; i++) 
+		{
 			int droprate;
 			if (mob->dropitem[i].nameid <= 0 || mob->dropitem[i].p < 1 || (item_data = itemdb_exists(mob->dropitem[i].nameid)) == NULL)
 				continue;
 			droprate = mob->dropitem[i].p;
 
 #ifdef RENEWAL_DROP
-			if( battle_config.atcommand_mobinfo_type ) {
+			if( battle_config.atcommand_mobinfo_type ) 
+			{
 				droprate = droprate * pc_level_penalty_mod(mob->lv - sd->status.base_level, mob->status.class_, mob->status.mode, 2) / 100;
 				if (droprate <= 0 && !battle_config.drop_rate0item)
 					droprate = 1;
@@ -7367,6 +7348,7 @@ ACMD_FUNC(mobinfo)
 				strcpy(atcmd_output, " ");
 			}
 		}
+
 		if (j == 0)
 			clif_displaymessage(fd, msg_txt(sd,1246)); // This monster has no drops.
 		else if (j % 3 != 0)
@@ -8511,7 +8493,7 @@ ACMD_FUNC(maspowerr)
 }
 
 /*==========================================
- * Comando para Corazón de Ciudad [Zephyrus]
+ * Comando para CorazÃ³n de Ciudad [Zephyrus]
  *------------------------------------------
  */
 void cityheart_sub(int id, const int master_id)
@@ -8542,7 +8524,7 @@ ACMD_FUNC(cityheart)
 	hpmas = cap_value(hpmas,1,10000000);
 	allied = cap_value(allied,0,1);
 
-	// Creación del Corazón
+	// CreaciÃ³n del CorazÃ³n
 	md = (struct mob_data *)map_id2bl(mob_once_spawn_especial(sd, "this", sd->bl.x, sd->bl.y, name, MOBID_EMPERIUM, 1, "", hpmas, 0, allied, false, 0, 1, true, false, true, 0, 0, 0, false, 0, 0));
 	if (md) {
 		clif_misceffect(&md->bl,344);
@@ -8591,7 +8573,7 @@ ACMD_FUNC(mobdemolition)
 ACMD_FUNC(mobevent)
 {
 	char name[NAME_LENGTH];
-	int mob_id = 0, range, x = 0, y = 0;
+	int mob_id = 0, range;
 	int number = 1, tamano = 0, hpmas = 0, slaves = 0, spawntipo = 0, showkill = 0, mostrarhp = 0, pasawarps = 0, aliado = 0, hprateannounce = 0, noexpnodrop = 1, item_drop = 0, item_amount = 0;
 	int count, i, k;
 	short mx, my;
@@ -8772,7 +8754,7 @@ ACMD_FUNC(whosell)
 				clif_viewpoint(sd, 1, 1, b_sd[i]->bl.x, b_sd[i]->bl.y, i, 0xFFFFFF);
 		}
 		else
-			sprintf(output, "[%d] '%s' no está en tiendas...", item_array[i]->nameid, item_array[i]->jname);
+			sprintf(output, "[%d] '%s' no estÃ¡ en tiendas...", item_array[i]->nameid, item_array[i]->jname);
 
 		clif_displaymessage(sd->fd, output);
 	}
@@ -8781,7 +8763,7 @@ ACMD_FUNC(whosell)
 }
 
 /*==========================================
- * Creación de items en el suelo, en un Area.
+ * CreaciÃ³n de items en el suelo, en un Area.
  *------------------------------------------*/
 ACMD_FUNC(flooritem)
 {
@@ -9341,7 +9323,7 @@ static int atwhopk_sub(struct block_list *bl,va_list ap)
 	pl = (TBL_PC*)bl; // Esto lo retorna el Map_foreachinmap
 
 	if( !pl->state.pvpmode || pl == sd )
-		return 0; // Ignora jugadores que no estén en Modo PK o al Mismo Jugador
+		return 0; // Ignora jugadores que no estÃ©n en Modo PK o al Mismo Jugador
 
 	if( fd )
 	{
@@ -9763,8 +9745,6 @@ ACMD_FUNC(myinfo)
 		{ "Free/Kafra Points - %d", 0 },
 		{ "BattleGround Points - %d", 0 },
 		{ "Vote Points - %d", 0 },
-		{ "Dona Points - %d", 0 },
-
 		{ NULL, 0 }
 	};
 
@@ -9773,15 +9753,8 @@ ACMD_FUNC(myinfo)
 	//direct array initialization with variables is not standard C compliant.
 	output_table[0].value = sd->cashPoints;
 	output_table[1].value = sd->kafraPoints;
-	if( battle_config.myinfo_event_vote_points )
-	{
-	output_table[0].value = sd->cashPoints;
-	output_table[1].value = sd->kafraPoints;
 	output_table[2].value = pc_readaccountreg(sd,add_str("#BGPOINTS"));
 	output_table[3].value = pc_readaccountreg(sd,add_str("#VOTEPOINTS"));
-	output_table[3].value = pc_readaccountreg(sd,add_str("#DONAPOINTS"));
-
-	}
 
 	sprintf(output, "'%s' Info:", sd->status.name); // '%s' stats:
 	clif_displaymessage(fd,output);
@@ -11763,6 +11736,7 @@ ACMD_FUNC(adopt)
 	return -1;
 }
 
+
 ACMD_FUNC(dance) 
 {
    nullpo_retr(-1, sd);
@@ -11862,32 +11836,6 @@ ACMD_FUNC(votepoints)
 
 	pc_setaccountreg(sd, add_str("#VOTEPOINTS"),  (value + cantidad));
 	clif_displaymessage( fd,"[Vote Points]: Updated, @myinfo for more information");
-	return 0;
-}
-
-ACMD_FUNC(donapoints) 
-{
-	char output[CHAT_SIZE_MAX];
-	int value, cantidad;
-	memset(output, '\0', sizeof(output));
-	
-	if( !message || !*message || sscanf(message, "%d", &cantidad) < 1 ) 
-	{
-		clif_displaymessage(fd, "@donapoints <(+/-)quantity>");
-		return -1;
-	}
-
-	value = pc_readaccountreg(sd, add_str("#DONAPOINTS"));
-	if ( abs(cantidad) > value && cantidad < 0 ) 
-	{
-		sprintf(output,"%s only have %d dona points, value updated to -%d",sd->status.name,value,value);
-		clif_displaymessage(fd,output);
-		clif_displaymessage(fd,output);
-		cantidad = (-1)*value;
-	}
-
-	pc_setaccountreg(sd, add_str("#DONAPOINTS"),  (value + cantidad));
-	clif_displaymessage( fd,"[Dona Points]: Updated, @myinfo for more information");
 	return 0;
 }
 
@@ -12021,6 +11969,59 @@ ACMD_FUNC(house)
 	} 
 	clif_displaymessage(fd,"Your guild hasn't house");
 	return -1;
+}
+
+/**
+ *	OBORO CONTROL PANEL
+ *	NANOSOFT (C)
+ *	HARMONY COMMAND ISAAC @macinfo not @netinfo
+ *	in @netinfo u see your mac ip, ip,
+ *	with @macinfo you see account's with same macs
+ **/
+ACMD_FUNC(macinfo) 
+{
+	
+	StringBuf buf;
+	char output[CHAT_SIZE_MAX];	
+	int account_id, cabeza = 0;
+	char* data;
+	char userid[NAME_LENGTH], last_mac[20];
+	nullpo_retr(-1, sd);
+
+	StringBuf_Init(&buf);
+	StringBuf_Printf(&buf,"SELECT `account_id`,`userid`,`last_mac` FROM `login` WHERE `last_mac` = ( SELECT `last_mac` FROM `login` WHERE `account_id` = '%d')", sd->status.account_id);
+
+	if( !SQL_ERROR == Sql_Query(mmysql_handle, StringBuf_Value(&buf)) ) 
+	{
+		while( SQL_SUCCESS == Sql_NextRow(mmysql_handle) ) 
+		{
+			Sql_GetData(mmysql_handle, 0, &data, NULL); account_id = atoi(data);
+			Sql_GetData(mmysql_handle, 1, &data, NULL); safestrncpy(userid, data, sizeof(userid));
+			Sql_GetData(mmysql_handle, 2, &data, NULL); safestrncpy(last_mac, data, sizeof(last_mac));
+
+			if ( cabeza == 0 ) 
+			{
+				sprintf(output," ==== ACCOUNT's ACCESS FROM MAC: %s ==== ", last_mac);
+				clif_displaymessage(fd,output);
+				clif_displaymessage(fd," ");
+				cabeza = 1;
+			}
+
+			sprintf(output, "[ Account ID ]: %d [ User ]: %s ", account_id, userid);
+			clif_displaymessage(fd, output);
+		}
+	}
+
+	if ( cabeza == 1 ) 
+	{
+		clif_displaymessage(fd," ");
+		clif_displaymessage(fd,"===================================================");
+	}
+
+	StringBuf_Destroy(&buf);
+	Sql_FreeResult(mmysql_handle);
+
+	return 0;
 }
 
 /**
@@ -12235,7 +12236,7 @@ ACMD_FUNC(changebg)
 	}
 	else
 	{
-		clif_displaymessage(fd, "Falló no se encontró NPC");
+		clif_displaymessage(fd, "FallÃ³ no se encontrÃ³ NPC");
 		return -1;
 	}
 }
@@ -12333,7 +12334,7 @@ ACMD_FUNC(changebglimit)
 	}
 	else
 	{
-		clif_displaymessage(fd, "Falló no se encontró NPC");
+		clif_displaymessage(fd, "FallÃ³ no se encontrÃ³ NPC");
 		return -1;
 	}
 
@@ -12370,333 +12371,6 @@ ACMD_FUNC(hold)
 	return 0;
 }
 
-ACMD_FUNC(gepard_block_nick)
-{
-	struct map_session_data* violator_sd;
-	time_t time_server;
-	unsigned int duration;
-	unsigned int violator_account_id = 0;
-	unsigned int violator_unique_id = 0;
-	char reason_str[GEPARD_REASON_LENGTH];
-	char unban_time_str[GEPARD_TIME_STR_LENGTH];
-	char violator_name[NAME_LENGTH];
-	char duration_type, *command_info = "Wrong input (usage: @gepard_block_nick <duration> <duration_type m/h/d> \"<char name>\" <reason>)";
-
-	nullpo_retr(-1, sd);
-
-	memset(atcmd_player_name, '\0', sizeof(atcmd_player_name));
-
-	if (!message || !*message || sscanf(message, "%u %c \"%23[^\"]\" %99[^\n]", &duration, &duration_type, violator_name, reason_str) < 4)
-	{
-		clif_displaymessage(fd, command_info);
-		return -1;
-	}
-
-	time(&time_server);
-
-	switch (duration_type)
-	{
-		case 'm':
-			time_server += (duration * 60);
-		break;
-
-		case 'h':
-			time_server += (duration * 3600);
-		break;
-
-		case 'd':
-			time_server += (duration * 86400);
-		break;
-
-		default:
-			duration = 0;
-		break;
-	}
-
-	if (duration == 0)
-	{
-		clif_displaymessage(fd, command_info);
-		return -1;
-	}
-
-	strftime(unban_time_str, sizeof(unban_time_str), "%Y-%m-%d %H:%M:%S", localtime(&time_server)); 
-
-	sprintf(atcmd_output, "Request: block by name - %s", violator_name);
-	clif_displaymessage(fd, atcmd_output);
-
-	violator_sd = map_nick2sd(violator_name);
-
-	if (violator_sd != NULL)
-	{
-		violator_account_id = violator_sd->status.account_id;
-		violator_unique_id = session[violator_sd->fd]->gepard_info.unique_id;
-	}
-
-	chrif_gepard_req_block(violator_unique_id, violator_name, violator_account_id, sd->status.name, sd->status.account_id, unban_time_str, reason_str);
-
-	return 0;
-}
-
-ACMD_FUNC(gepard_block_account_id)
-{
-	struct map_session_data* violator_sd;
-	time_t time_server;
-	unsigned int duration;
-	unsigned int violator_account_id = 0;
-	unsigned int violator_unique_id = 0;
-	char reason_str[GEPARD_REASON_LENGTH];
-	char unban_time_str[GEPARD_TIME_STR_LENGTH];
-	char duration_type, *command_info = "Wrong input (usage: @gepard_block_account_id <duration> <duration_type m/h/d> <account ID> <reason>)";
-
-	nullpo_retr(-1, sd);
-
-	memset(atcmd_player_name, '\0', sizeof(atcmd_player_name));
-
-	if (!message || !*message || sscanf(message, "%u %c %u %99[^\n]", &duration, &duration_type, &violator_account_id, reason_str) < 4)
-	{
-		clif_displaymessage(fd, command_info);
-		return -1;
-	}
-
-	time(&time_server);
-
-	switch (duration_type)
-	{
-		case 'm':
-			time_server += (duration * 60);
-		break;
-
-		case 'h':
-			time_server += (duration * 3600);
-		break;
-
-		case 'd':
-			time_server += (duration * 86400);
-		break;
-
-		default:
-			duration = 0;
-		break;
-	}
-
-	if (duration == 0)
-	{
-		clif_displaymessage(fd, command_info);
-		return -1;
-	}
-
-	strftime(unban_time_str, sizeof(unban_time_str), "%Y-%m-%d %H:%M:%S", localtime(&time_server)); 
-
-	sprintf(atcmd_output, "Request: block by account ID: %u", violator_account_id);
-	clif_displaymessage(fd, atcmd_output);
-
-	violator_sd = map_id2sd(violator_account_id);
-
-	if (violator_sd != NULL)
-	{
-		violator_account_id = violator_sd->status.account_id;
-		violator_unique_id = session[violator_sd->fd]->gepard_info.unique_id;
-	}
-
-	chrif_gepard_req_block(violator_unique_id, atcmd_player_name, violator_account_id, sd->status.name, sd->status.account_id, unban_time_str, reason_str);
-
-	return 0;
-}
-
-ACMD_FUNC(gepard_block_unique_id)
-{
-	time_t time_server;
-	unsigned int duration;
-	unsigned int violator_unique_id = 0;
-	char reason_str[GEPARD_REASON_LENGTH];
-	char unban_time_str[GEPARD_TIME_STR_LENGTH];
-	char duration_type, *command_info = "Wrong input (usage: @gepard_block_unique_id <duration> <duration_type m/h/d> <unique ID> <reason>)";
-
-	nullpo_retr(-1, sd);
-
-	memset(atcmd_player_name, '\0', sizeof(atcmd_player_name));
-
-	if (!message || !*message || sscanf(message, "%u %c %u %99[^\n]", &duration, &duration_type, &violator_unique_id, reason_str) < 4)
-	{
-		clif_displaymessage(fd, command_info);
-		return -1;
-	}
-
-	time(&time_server);
-
-	switch (duration_type)
-	{
-		case 'm':
-			time_server += (duration * 60);
-		break;
-
-		case 'h':
-			time_server += (duration * 3600);
-		break;
-
-		case 'd':
-			time_server += (duration * 86400);
-		break;
-
-		default:
-			duration = 0;
-		break;
-	}
-
-	if (duration == 0)
-	{
-		clif_displaymessage(fd, command_info);
-		return -1;
-	}
-
-	strftime(unban_time_str, sizeof(unban_time_str), "%Y-%m-%d %H:%M:%S", localtime(&time_server)); 
-
-	sprintf(atcmd_output, "Request: block by unqiue ID: %u", violator_unique_id);
-	clif_displaymessage(fd, atcmd_output);
-
-	chrif_gepard_req_block(violator_unique_id, NULL, 0, sd->status.name, sd->status.account_id, unban_time_str, reason_str);
-
-	return 0;
-}
-
-ACMD_FUNC(gepard_unblock_nick)
-{
-	char violator_name[NAME_LENGTH];
-	char* command_info = "Wrong input (usage: @gepard_unblock_nick <char name>)";
-
-	nullpo_retr(-1, sd);
-
-	if (!message || !*message || sscanf(message, "\"%23[^\"]\"[^\n]", violator_name) < 1)
-	{
-		clif_displaymessage(fd, command_info);
-		return -1;
-	}
-
-	sprintf(atcmd_output, "Request: unblock by name - %s", violator_name);
-
-	clif_displaymessage(fd, atcmd_output);
-
-	chrif_gepard_req_unblock(0, violator_name, 0, sd->status.account_id);
-
-	return 0;
-}
-
-ACMD_FUNC(gepard_unblock_account_id)
-{
-	int violator_aid;
-	char* command_info = "Wrong input (usage: @gepard_unblock_account_id <account ID>)";
-
-	nullpo_retr(-1, sd);
-
-	memset(atcmd_player_name, '\0', sizeof(atcmd_player_name));
-
-	if (!message || !*message || sscanf(message, "%d", &violator_aid) < 1)
-	{
-		clif_displaymessage(fd, command_info);
-		return -1;
-	}
-
-	sprintf(atcmd_output, "Request: unblock by account id - %d", violator_aid);
-
-	clif_displaymessage(fd, atcmd_output);
-
-	chrif_gepard_req_unblock(0, NULL, violator_aid, sd->status.account_id);
-
-	return 0;
-}
-
-ACMD_FUNC(gepard_unblock_unique_id)
-{
-	unsigned int violator_unique_id;
-	char* command_info = "Wrong input (usage: @gepard_unblock_unique_id <unique ID>)";
-
-	nullpo_retr(-1, sd);
-
-	if (!message || !*message || sscanf(message, "%u", &violator_unique_id) < 1)
-	{
-		clif_displaymessage(fd, command_info);
-		return -1;
-	}
-
-	sprintf(atcmd_output, "Request: unblock by unique id - %u", violator_unique_id);
-
-	clif_displaymessage(fd, atcmd_output);
-
-	chrif_gepard_req_unblock(violator_unique_id, NULL, 0, sd->status.account_id);
-
-	return 0;
-}
-
-ACMD_FUNC(set_allowed_gepard_version)
-{
-	FILE* fp;
-	unsigned int gepard_version;
-
-	nullpo_retr(-1, sd);
-
-	gepard_version = strtoul(message, NULL, 10);
-
-	if ((fp = fopen("conf/gepard_version.txt", "w+")) == NULL)
-	{
-		clif_displaymessage(fd, "Can not open conf/gepard_version.txt !");
-		return -1;
-	}
-
-	fprintf (fp, "%u", gepard_version);
-
-	fclose(fp);
-
-	min_allowed_gepard_version = gepard_version;
-
-	sprintf(atcmd_output, "Min allowed Gepard version was set to %u !", min_allowed_gepard_version);
-	clif_displaymessage(fd, atcmd_output);
-
-	return 0;
-}
-
-ACMD_FUNC(get_allowed_gepard_version)
-{
-	sprintf(atcmd_output, "Min allowed version of Gepard Shield is %u", min_allowed_gepard_version);
-	clif_displaymessage(fd, atcmd_output);
-
-	return 0;
-}
-
-ACMD_FUNC(set_allowed_gepard_grf_hash)
-{
-	FILE* fp;
-	unsigned int gepard_grf_hash;
-
-	nullpo_retr(-1, sd);
-
-	gepard_grf_hash = strtoul(message, NULL, 10);
-
-	if ((fp = fopen("conf/gepard_grf_hash.txt", "w+")) == NULL)
-	{
-		clif_displaymessage(fd, "Can not open conf/gepard_grf_hash.txt !");
-		return -1;
-	}
-
-	fprintf (fp, "%u", gepard_grf_hash);
-
-	fclose(fp);
-
-	allowed_gepard_grf_hash = gepard_grf_hash;
-
-	sprintf(atcmd_output, "Allowed Gepard GRF hash was set to %u !", allowed_gepard_grf_hash);
-	clif_displaymessage(fd, atcmd_output);
-
-	return 0;
-}
-
-ACMD_FUNC(get_allowed_gepard_grf_hash)
-{
-	sprintf(atcmd_output, "Allowed Gepard GRF hash is %u", allowed_gepard_grf_hash);
-	clif_displaymessage(fd, atcmd_output);
-
-	return 0;
-}
-
 
 #include "../custom/atcommand.inc"
 
@@ -12724,6 +12398,7 @@ void atcommand_basecommands(void) {
 		ACMD_DEF(rtransfer),
 		ACMD_DEF(wtransfer),
 		ACMD_DEF(transfer),
+		ACMD_DEF(macinfo),
 		ACMD_DEF(house),
 		ACMD_DEF(restock),
 		ACMD_DEF(wrestock),
@@ -12733,7 +12408,6 @@ void atcommand_basecommands(void) {
 		ACMD_DEF(partybuff),
 		ACMD_DEF2("spb", partybuff),
 		ACMD_DEF(votepoints),
-		ACMD_DEF(donapoints),
 		ACMD_DEF2("oboro", showoboroinfo),
 		//new bg commands...
 		ACMD_DEF(changebg),
@@ -12743,16 +12417,6 @@ void atcommand_basecommands(void) {
 		ACMD_DEF(changebglimit),
 		ACMD_DEF(peco),
 		ACMD_DEF(hold),
-		ACMD_DEF(gepard_block_nick),
-		ACMD_DEF(gepard_block_account_id),
-		ACMD_DEF(gepard_block_unique_id),
-		ACMD_DEF(gepard_unblock_nick),
-		ACMD_DEF(gepard_unblock_account_id),
-		ACMD_DEF(gepard_unblock_unique_id),
-		ACMD_DEF(set_allowed_gepard_version),
-		ACMD_DEF(get_allowed_gepard_version),
-		ACMD_DEF(set_allowed_gepard_grf_hash),
-		ACMD_DEF(get_allowed_gepard_grf_hash),
 		// [Oboro] -----------------
 		ACMD_DEF2R("warp", mapmove, ATCMD_NOCONSOLE),
 		ACMD_DEF(where),

@@ -3084,7 +3084,7 @@ int64 skill_attack (int attack_type, struct block_list* src, struct block_list *
 	struct Damage dmg;
 	struct status_data *sstatus, *tstatus;
 	struct status_change *sc, *tsc;
-	struct map_session_data *sd, *tsd;
+	struct map_session_data *sd, *tsd, *killer_sd, *dest_sd; // [Oboro]
 	int64 damage;
 	int8 rmdamage = 0;//magic reflected
 	int type;
@@ -3102,7 +3102,8 @@ int64 skill_attack (int attack_type, struct block_list* src, struct block_list *
 	if (status_bl_has_mode(bl,MD_SKILL_IMMUNE) || (status_get_class(bl) == MOBID_EMPERIUM && !(skill_get_inf3(skill_id)&INF3_HIT_EMP)))
 		return 0;
 
-	if (src != dsrc) {
+	if (src != dsrc) 
+	{
 		//When caster is not the src of attack, this is a ground skill, and as such, do the relevant target checking. [Skotlex]
 		if (!status_check_skilluse(battle_config.skill_caster_check?src:NULL, bl, skill_id, 2))
 			return 0;
@@ -3131,6 +3132,40 @@ int64 skill_attack (int attack_type, struct block_list* src, struct block_list *
 		return 0;
 
 	dmg = battle_calc_attack(attack_type,src,bl,skill_id,skill_lv,flag&0xFFF);
+
+	//[Oboro] isaac start SHARP in same guild with 0 damage
+	if ( skill_id == SN_SHARPSHOOTING )
+	{
+		killer_sd = BL_CAST(BL_PC, src);
+		dest_sd = BL_CAST(BL_PC, bl);
+		
+		if ( killer_sd && dest_sd && bl->type == BL_PC)
+		{
+			if ( map[killer_sd->bl.m].flag.gvg || map[killer_sd->bl.m].flag.gvg_castle || map[killer_sd->bl.m].flag.woe_set )
+			{
+				if ( killer_sd->status.guild_id == dest_sd->status.guild_id )
+				{
+					dmg.damage = dmg.damage2 = 0;
+					dmg.dmg_lv = ATK_MISS;
+				}
+			}
+			else if ( map[killer_sd->bl.m].flag.pvp || map[killer_sd->bl.m].flag.pvp_event || map[killer_sd->bl.m].flag.pvp_noguild || map[killer_sd->bl.m].flag.pvp_noparty )
+				; // si esta en un mapa pvp, que le pegue normalmente [Isaac]
+			else
+			{
+				if ( killer_sd->status.guild_id == dest_sd->status.guild_id )
+				{
+					dmg.damage = dmg.damage2 = 0;
+					dmg.dmg_lv = ATK_MISS;
+				}
+			}
+		} 
+		else if ( killer_sd && src->type == BL_PC && bl->type == BL_MOB && map[killer_sd->bl.m].flag.battleground )
+		{
+			dmg.damage = dmg.damage2 = 0;
+			dmg.dmg_lv = ATK_MISS;
+		}
+	}
 
 	//If the damage source is a unit, the damage is not delayed
 	if (src != dsrc && skill_id != GS_GROUNDDRIFT)
@@ -4371,12 +4406,12 @@ void skill_reveal_trap_inarea(struct block_list *src, int range, int x, int y) {
  *------------------------------------------*/
 int skill_castend_damage_id (struct block_list* src, struct block_list *bl, uint16 skill_id, uint16 skill_lv, unsigned int tick, int flag)
 {
-	struct map_session_data *sd = NULL;
+	struct map_session_data *sd = NULL, *dest_sd = NULL;
 	struct status_data *tstatus;
 	struct status_change *sc, *tsc;
 
 	if (skill_id > 0 && !skill_lv) return 0;
-
+	
 	nullpo_retr(1, src);
 	nullpo_retr(1, bl);
 
@@ -4629,6 +4664,16 @@ int skill_castend_damage_id (struct block_list* src, struct block_list *bl, uint
 
 	case SN_SHARPSHOOTING:
 	case MA_SHARPSHOOTING:
+		dest_sd = BL_CAST(BL_PC, bl); //[Oboro] isaac... sniper
+		if( (sd && dest_sd) && map[sd->bl.m].flag.battleground && sd->bg_id == dest_sd->bg_id && bl->type == BL_PC )
+			return 0;
+		
+		skill_area_temp[1] = bl->id;
+		map_foreachinpath (skill_attack_area,src->m,src->x,src->y,bl->x,bl->y,
+			skill_get_splash(skill_id, skill_lv),skill_get_maxcount(skill_id,skill_lv), splash_target(src),
+			skill_get_type(skill_id),src,src,skill_id,skill_lv,tick,flag,BCT_ENEMY);
+
+	break;
 	case NJ_KAMAITACHI:
 	case NPC_ACIDBREATH:
 	case NPC_DARKNESSBREATH:
@@ -11382,11 +11427,12 @@ int skill_castend_id(int tid, unsigned int tick, int id, intptr_t data)
 
 		if (!sd || sd->skillitem != ud->skill_id || skill_get_delay(ud->skill_id, ud->skill_lv))
 			ud->canact_tick = max(tick + skill_delayfix(src, ud->skill_id, ud->skill_lv), ud->canact_tick - SECURITY_CASTTIME);
-		if (sd) { //Cooldown application
+		if (sd) 
+		{ //Cooldown application
 			int cooldown = pc_get_skillcooldown(sd,ud->skill_id, ud->skill_lv); // Increases/Decreases cooldown of a skill by item/card bonuses.
 			if(cooldown) skill_blockpc_start(sd, ud->skill_id, cooldown);
 		}
-
+		
 		// [ISAAC] OBORO DELAYS START
 		if (sd && ud->skill_id && battle_config.oboro_enable > 0 &&
 			(
@@ -11411,7 +11457,7 @@ int skill_castend_id(int tid, unsigned int tick, int id, intptr_t data)
 				clif_disp_overhead(&sd->bl, message);
 			}
 		}
-
+		
 		if( battle_config.display_status_timers && sd )
 			clif_status_change(src, SI_ACTIONDELAY, 1, skill_delayfix(src, ud->skill_id, ud->skill_lv), 0, 0, 0);
 		if( sd && sd->skillitem != ud->skill_id )
@@ -11562,7 +11608,7 @@ int skill_castend_pos(int tid, unsigned int tick, int id, intptr_t data)
 	struct mob_data *md;
 	unsigned int before_fixed = 0, oboro_fixed = 0; //isaac Oboro CP
 	char message[256];
-
+	
 	nullpo_ret(ud);
 
 	sd = BL_CAST(BL_PC , src);
@@ -11665,7 +11711,7 @@ int skill_castend_pos(int tid, unsigned int tick, int id, intptr_t data)
 			int cooldown = pc_get_skillcooldown(sd,ud->skill_id, ud->skill_lv);
 			if(cooldown) skill_blockpc_start(sd, ud->skill_id, cooldown);
 		}
-
+		
 		// [ISAAC] OBORO DELAYS START
 		if (sd && ud->skill_id && battle_config.oboro_enable > 0 &&
 			(
@@ -11690,7 +11736,7 @@ int skill_castend_pos(int tid, unsigned int tick, int id, intptr_t data)
 				clif_disp_overhead(&sd->bl, message);
 			}
 		}
-
+		
 		if( battle_config.display_status_timers && sd )
 			clif_status_change(src, SI_ACTIONDELAY, 1, skill_delayfix(src, ud->skill_id, ud->skill_lv), 0, 0, 0);
 		if( sd && sd->skillitem != ud->skill_id )
@@ -12202,14 +12248,15 @@ int skill_castend_pos2(struct block_list* src, int x, int y, uint16 skill_id, ui
 		}
 		else
 		{
-		// [Oboro]
-			if (map[sd->bl.m].flag.woe_set ) 
+			// [Oboro]
+			if (map[sd->bl.m].flag.pvp  || map[sd->bl.m].flag.gvg || map[sd->bl.m].flag.woe_set || map[sd->bl.m].flag.gvg_castle || map[sd->bl.m].flag.battleground ) 
 			{
 				clif_displaymessage(sd->fd, "You can't use gospel on this map"); //isaac
 				status_change_end(src, SC_GOSPEL, INVALID_TIMER);
 				return 0;
 
 			}
+
 			sg = skill_unitsetting(src,skill_id,skill_lv,src->x,src->y,0);
 			if (!sg) break;
 			if (sce)
@@ -12866,7 +12913,6 @@ struct skill_unit_group *skill_unitsetting(struct block_list *src, uint16 skill_
 			return 0;
 		}
 		break;
-
 	case MH_STEINWAND:
 		val2 = 4 + skill_lv;
 		val3 = 300 * skill_lv + 65 * ( status->int_ +  status_get_lv(src) ) + status->max_sp; //nb hp
@@ -18847,7 +18893,7 @@ int skill_unit_move_sub(struct block_list* bl, va_list ap)
 int skill_unit_move(struct block_list *bl, unsigned int tick, int flag)
 {
 	nullpo_ret(bl);
-
+	
 	if( bl->prev == NULL )
 		return 0;
 

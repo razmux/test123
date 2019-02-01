@@ -7434,7 +7434,7 @@ BUILDIN_FUNC(itembound)
 		return 1;
 	}
 
-	if(itemdb_type(nameid) == IT_PETEGG )
+	if( itemdb_isstackable(nameid) || itemdb_type(nameid) == IT_PETEGG )
 	{
 		ShowError("buildin_itembound: invalid item type. Bound only work for non stackeable items (Item %d).", nameid);
 		return 1;
@@ -7510,7 +7510,7 @@ BUILDIN_FUNC(itembound2)
 	c3 = (short)script_getnum(st,9);
 	c4 = (short)script_getnum(st,10);
 	
-	if( nameid < 0 || (item_data = itemdb_exists(nameid)) == NULL) 
+	if( nameid < 0 || (item_data = itemdb_exists(nameid)) == NULL || itemdb_isstackable2(item_data) )
 		return 0;
 
 	memset(&item_tmp,0,sizeof(item_tmp));
@@ -24489,7 +24489,7 @@ BUILDIN_FUNC(ItemHasSlot)
 *------------------------------------------*/
 BUILDIN_FUNC(title) 
 {
-	char *NPC_NAME = "^77B727 LegendRO ^000000";
+	char *NPC_NAME = "^77B727 XRO ^000000";
 	char NPC[CHAT_SIZE_MAX];
 	TBL_PC* sd = script_rid2sd(st);
 	if( sd == NULL )
@@ -24634,12 +24634,9 @@ BUILDIN_FUNC(mapeventwarp)
 /**
  * ChangeBG();
  * [Oboro] Isaac
- * Update for change rond
- * By: DarbladErxX
  **/
 BUILDIN_FUNC(ChangeBG)
 {
-	struct npc_data *nd, *nd2;
 	int next = 0;
 	char BG_Var[12];
 
@@ -24656,20 +24653,8 @@ BUILDIN_FUNC(ChangeBG)
 	sprintf(BG_Var,"$NEXTBG_%d", next);
 
 	mapreg_setreg(add_str("$CURRENTPOCBG"), next);
-	mapreg_setreg(add_str("$CURRENTBG"), (mapreg_readreg(add_str(BG_Var)) ? mapreg_readreg(add_str(BG_Var)) : 1));
-
-	//delwaitingroom
-	nd = npc_name2id("BGAZUL");
-	nd2 = npc_name2id("BGROJO");
-
-	if(nd != NULL && nd2 != NULL)
-	{
-		chat_deletenpcchat(nd);
-		chat_deletenpcchat(nd2);
-		npc_event_do("BGAZUL::OnUpdateBG");
-		npc_event_do("BGROJO::OnUpdateBG");
-		return 0;
-	}
+	mapreg_setreg(add_str("$CURRENTBG"), mapreg_readreg(add_str(BG_Var)));
+	return 0;
 }
 
 /**
@@ -24683,21 +24668,6 @@ BUILDIN_FUNC(bg_item)
 	winlost = script_getnum(st,3);
 	bg_team_getitem(bg_id, winlost);
 	return 0;
-}
-
-BUILDIN_FUNC(get_unique_id)
-{
-	struct map_session_data* sd = script_rid2sd(st);
-
-	if (sd == NULL)
-	{
-		script_pushint(st, 0);
-		return SCRIPT_CMD_FAILURE;
-	}
-
-	script_pushint(st, session[sd->fd]->gepard_info.unique_id);
-
-	return SCRIPT_CMD_SUCCESS;
 }
 
 
@@ -24727,9 +24697,6 @@ struct script_function buildin_func[] = {
 	BUILDIN_DEF(mapeventwarp, "ssiisiii"),
 	BUILDIN_DEF(ChangeBG,""),
 	BUILDIN_DEF(bg_item,"ii"),
-	BUILDIN_DEF(getitem_map,"iis??"),
-	BUILDIN_DEF(get_unique_id,""),
-
 
 	// NPC interaction
 	BUILDIN_DEF(mes,"s*"),
@@ -24954,7 +24921,7 @@ struct script_function buildin_func[] = {
 	BUILDIN_DEF(setcastledata,"sii"),
 	BUILDIN_DEF(requestguildinfo,"i?"),
 	BUILDIN_DEF(getequipcardcnt,"i"),
-	//BUILDIN_DEF(successremovecards,"i"),
+	BUILDIN_DEF(successremovecards,"i"),
 	BUILDIN_DEF(failedremovecards,"ii"),
 	BUILDIN_DEF(marriage,"s"),
 	BUILDIN_DEF2(wedding_effect,"wedding",""),

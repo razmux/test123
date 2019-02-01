@@ -1619,7 +1619,7 @@ uint8 pc_isequip(struct map_session_data *sd,int n)
 		}
 	}
 
-	//	[Oboro] ISAAC NO PERMITE GLORIOUS BOW +10 EN MF GVG
+	//	[Oboro] ISAAC NO PERMITE GLORIOUS BOW +7.8.9.10 EN MF GVG
 	if ( map[sd->bl.m].flag.gvg_castle || map[sd->bl.m].flag.gvg || map[sd->bl.m].flag.woe_set ) 
 	{
 		switch(sd->status.inventory[n].nameid)
@@ -1627,8 +1627,7 @@ uint8 pc_isequip(struct map_session_data *sd,int n)
 			case 1743: // G.Bow
 			case 1281: // G. Katar
 			case 1282: // G. Katar 2
-			case 1546: // Morning Star
-				if ( sd->status.inventory[n].refine > 10 )
+				if ( sd->status.inventory[n].refine > 6 )
 					return 0;
 			break;
 		}
@@ -2149,7 +2148,7 @@ void pc_reg_received(struct map_session_data *sd)
 	}
 	else
 		clif_displaymessage(sd->fd, "Item Security System DISABLE : Use @security for more options.");
-
+	
 	if( pc_isPremium(sd) )
 	{
 		int tick = sd->Premium_Tick - (int)time(NULL), day, hour, minute, second;
@@ -2164,10 +2163,9 @@ void pc_reg_received(struct map_session_data *sd)
 		clif_disp_onlyself(sd, output, strlen(output));
 	}
 
-	if( battle_config.bg_reward_rates != 100 )
+	if( battle_config.bg_event_extra_badges > 0 )
 	{
-		int erate = battle_config.bg_reward_rates - 100;
-		sprintf(output, "Battleground Happy Hour. Rates at + %d %%", erate);
+		sprintf(output, "[Event]: Battleground Happy Hour. Giving + %d Badges", battle_config.bg_event_extra_badges);
 		clif_displaymessage(sd->fd, output);
 	}
 
@@ -5362,7 +5360,8 @@ char pc_delitem(struct map_session_data *sd,int n,int amount,int type, short rea
 
 	sd->status.inventory[n].amount -= amount;
 	sd->weight -= sd->inventory_data[n]->weight*amount ;
-	if( sd->status.inventory[n].amount <= 0 ){
+	if( sd->status.inventory[n].amount <= 0 )
+	{
 		if(sd->status.inventory[n].equip)
 			pc_unequipitem(sd,n,3);
 		memset(&sd->status.inventory[n],0,sizeof(sd->status.inventory[0]));
@@ -5831,8 +5830,6 @@ int pc_useitem(struct map_session_data *sd,int n)
 	return 1;
 }
 
-
-
 /**
  * Add item on cart for given index.
  * @param sd
@@ -6165,6 +6162,7 @@ int pc_steal_coin(struct map_session_data *sd,struct block_list *target)
 
 /*------------------------------------------
  * pc_getitem_map [Xantara]
+ * [Oboro] Emulator
  *------------------------------------------*/
 int pc_getitem_map(struct map_session_data *sd,struct item it,int amt,int count,e_log_pick_type log_type)
 {
@@ -6186,7 +6184,6 @@ int pc_getitem_map(struct map_session_data *sd,struct item it,int amt,int count,
 	}
 	return 1;
 }
-
 
 /*==========================================
  * Set's a player position.
@@ -6253,7 +6250,6 @@ enum e_setpos pc_setpos(struct map_session_data* sd, unsigned short mapindex, in
 			}
 		}
 	}
-
 	if( (map[m].flag.blocked && !pc_has_permission(sd,PC_PERM_WARP_ANYWHERE)) || (map[m].flag.ancient && (sd->md || !pc_class2ancientwoe(sd->status.class_) || pc_checkskill(sd, ALL_INCCARRY))) )
 	{
 		mapindex = sd->status.save_point.map;
@@ -6282,7 +6278,6 @@ enum e_setpos pc_setpos(struct map_session_data* sd, unsigned short mapindex, in
 			m = map_mapindex2mapid(mapindex);
 		}
 	}
-
 	// - [Oboro] House System
 	else if (strncmp(map[m].name, "gr_", 3) == 0 && pc_get_group_level(sd) < 60 ) 
 	{
@@ -6298,7 +6293,6 @@ enum e_setpos pc_setpos(struct map_session_data* sd, unsigned short mapindex, in
 			m = map_mapindex2mapid(mapindex);
 		}
 	}
-
 	else if( map[m].party_max && sd->bl.m != m && sd->status.party_id && (p = party_search(sd->status.party_id)) != NULL )
 	{ // Party Limit
 		for( i = c = 0; i < MAX_PARTY && c < map[m].party_max; i++ )
@@ -9127,7 +9121,7 @@ int pc_dead(struct map_session_data *sd,struct block_list *src,uint16 skill_id)
 	int i=0,k=0;
 	unsigned int tick = gettick();
 	short flag = 0;
-	int drop_skull_rate = sd->status.base_level; // Declaracion para sistema de porcentaje de drop trofeo [Tab]
+	//int drop_skull_rate = sd->status.base_level; // Declaracion para sistema de porcentaje de drop trofeo [Tab]
 
 	// Activate Steel body if a super novice dies at 99+% exp [celest]
 	// Super Novices have no kill or die functions attached when saved by their angel
@@ -9275,7 +9269,7 @@ int pc_dead(struct map_session_data *sd,struct block_list *src,uint16 skill_id)
 		pc_calc_ranking(sd, ssd, skill_id); // Ranking System
 		pc_setparam(ssd, SP_KILLEDRID, sd->bl.id);
 		npc_script_event(ssd, NPCE_KILLPC);
-
+		
 		// - [Oboro]
 		// nuevo sistema de PVP para Ranking Oboro
 		if (sd && ssd && map[sd->bl.m].flag.pvp)
@@ -9290,7 +9284,6 @@ int pc_dead(struct map_session_data *sd,struct block_list *src,uint16 skill_id)
 				}
 			}
 		}
-
 
 		if( ssd->status.guild_id && guild_wardamage(sd) )
 			flag = 2;
@@ -11651,6 +11644,24 @@ void pc_checkitem(struct map_session_data *sd) {
 			continue;
 		}
 
+		if ( map[sd->bl.m].flag.gvg_castle || map[sd->bl.m].flag.gvg || map[sd->bl.m].flag.woe_set ) 
+		{
+				/*	ISAAC NO PERMITE GLORIOUS BOW +7.8.9.10 EN MF GVG... */
+				switch(sd->status.inventory[i].nameid)
+				{
+					case 1743: // G.Bow
+					case 1281: // G. Katar
+					case 1282: // G. Katar 2
+						if ( sd->status.inventory[i].refine > 6 )
+						{
+							pc_unequipitem(sd, i, 2);
+							calc_flag = 1;	
+							continue;
+						}
+					break;
+				}
+			}
+
 		if( !pc_has_permission(sd, PC_PERM_USE_ALL_EQUIPMENT) && !battle_config.allow_equip_restricted_item && itemdb_isNoEquip(sd->inventory_data[i], sd->bl.m) ) {
 			pc_unequipitem(sd, i, 2);
 			calc_flag = 1;
@@ -13982,7 +13993,7 @@ void do_init_pc(void) {
 		day_timer_tid   = add_timer_interval(gettick() + (night_flag ? 0 : day_duration) + night_duration, map_day_timer,   0, 0, day_duration + night_duration);
 		night_timer_tid = add_timer_interval(gettick() + day_duration + (night_flag ? night_duration : 0), map_night_timer, 0, 0, day_duration + night_duration);
 	}
-
+	
 	do_init_pc_groups();
 
 	pc_sc_display_ers = ers_new(sizeof(struct sc_display_entry), "pc.c:pc_sc_display_ers", ERS_OPT_FLEX_CHUNK);
@@ -13992,5 +14003,5 @@ void do_init_pc(void) {
 
 	ers_chunk_size(pc_sc_display_ers, 150);
 	ers_chunk_size(num_reg_ers, 300);
-	ers_chunk_size(str_reg_ers, 50);
+	ers_chunk_size(str_reg_ers, 50);	
 }
