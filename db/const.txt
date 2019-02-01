@@ -21,6 +21,8 @@ mf_woe_level	72
 mf_blocked	73
 mf_nostorage	74
 mf_noguildstorage	75
+mf_nodiscount	76
+mf_guildmin	77
 
 //Item Group ID
 IG_BlueBox	1
@@ -493,6 +495,7 @@ IG_Animal_Costume_Scroll	467
 IG_Midgard_Lucky_Scroll	468
 IG_Blessing_Scarlet_Egg	469
 IG_Mystical_Costume_Scroll	470
+IG_KawaiiBox	471
 
 EF_NONE	-1
 EF_HIT1	0
